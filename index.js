@@ -1,7 +1,7 @@
 import 'dotenv/config';
 
 import { Client, GatewayIntentBits } from 'discord.js';
-import { runParachuteDrop } from './commands/single_drop.js';
+import { runParachuteDrop, runGroupParachuteDrop } from './commands/drop.js';
 
 
 const dropCooldowns = new Map();
@@ -10,7 +10,10 @@ const dropCooldowns = new Map();
 const client = new Client({ intents: [
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.Guilds]
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildMessageTyping,
+]
 });
 
 // Set the bot's prefix
@@ -56,6 +59,8 @@ client.on('messageCreate', async (message) => {
         dropCooldowns.set(message.author.id, Date.now() + 60000);
 
         await runParachuteDrop(message, args);
+    } else if (command.toLowerCase() === PREFIX + 'gdrop') {
+        await runGroupParachuteDrop(message, args);
     }
 });
 
